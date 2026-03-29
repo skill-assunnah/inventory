@@ -17,15 +17,15 @@
     </header>
 
     <section class="stats">
-      <div class="card">
+      <div class="card stat-card">
         <span>Total Items</span>
         <strong id="totalItems">0</strong>
       </div>
-      <div class="card">
+      <div class="card stat-card">
         <span>Total Quantity</span>
         <strong id="totalQty">0</strong>
       </div>
-      <div class="card">
+      <div class="card stat-card">
         <span>Last Refresh</span>
         <strong id="lastRefresh">-</strong>
       </div>
@@ -52,14 +52,26 @@
               <th>Price</th>
               <th>Grand Total</th>
               <th>Remarks</th>
+              <th>View</th>
             </tr>
           </thead>
           <tbody id="inventoryTableBody">
-            <tr><td colspan="8" class="center">Loading...</td></tr>
+            <tr><td colspan="9" class="center">Loading...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
+  </div>
+
+  <div class="modal hidden" id="detailsModal">
+    <div class="modal-backdrop" id="detailsBackdrop"></div>
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2>Item Details</h2>
+        <button class="icon-btn" id="closeDetailsBtn" type="button">×</button>
+      </div>
+      <div id="detailsContent" class="details-grid"></div>
+    </div>
   </div>
 
   <script src="app.js"></script>
