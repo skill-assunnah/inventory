@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div>
+        <h1>Inventory List</h1>
+        <p class="muted">Live inventory synced from Google Sheet</p>
+      </div>
+      <a class="admin-link" href="admin.html">Admin</a>
+    </header>
+
+    <section class="stats">
+      <div class="card">
+        <span>Total Items</span>
+        <strong id="totalItems">0</strong>
+      </div>
+      <div class="card">
+        <span>Total Quantity</span>
+        <strong id="totalQty">0</strong>
+      </div>
+      <div class="card">
+        <span>Last Refresh</span>
+        <strong id="lastRefresh">-</strong>
+      </div>
+    </section>
+
+    <section class="controls card">
+      <input type="text" id="searchInput" placeholder="Search item, brand, category..." />
+      <select id="categoryFilter">
+        <option value="">All Categories</option>
+      </select>
+      <button id="refreshBtn">Refresh</button>
+    </section>
+
+    <section class="table-wrap card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Category</th>
+              <th>Item Name</th>
+              <th>Brand</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Grand Total</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTableBody">
+            <tr><td colspan="8" class="center">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
