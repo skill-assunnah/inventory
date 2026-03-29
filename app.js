@@ -4,7 +4,7 @@ let inventory = [];
 
 async function fetchInventory() {
   const tbody = document.getElementById('inventoryTableBody');
-  tbody.innerHTML = '<tr><td colspan="8" class="center">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="9" class="center">Loading...</td></tr>';
 
   try {
     const res = await fetch(`${API_URL}?action=list`);
@@ -17,7 +17,7 @@ async function fetchInventory() {
     renderInventory();
     updateStats();
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="8" class="center">${err.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="center">${err.message}</td></tr>`;
   }
 }
 
@@ -48,7 +48,9 @@ function renderInventory() {
       item.category,
       item.item_name,
       item.brand,
-      item.remarks
+      item.remarks,
+      item.model_or_specification,
+      item.manufacturer
     ].join(' ').toLowerCase();
 
     const matchesSearch = !search || haystack.includes(search);
@@ -56,7 +58,7 @@ function renderInventory() {
   });
 
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="center">No items found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" class="center">No items found.</td></tr>';
     return;
   }
 
@@ -70,17 +72,56 @@ function renderInventory() {
       <td>${formatNumber(item.price)}</td>
       <td>${formatNumber(item.grand_total)}</td>
       <td>${escapeHtml(item.remarks || '')}</td>
+      <td><button type="button" class="small-btn" onclick="openDetails('${escapeJs(item.id)}')">View</button></td>
     </tr>
   `).join('');
+}
+
+function openDetails(itemId) {
+  const item = inventory.find(i => String(i.id) === String(itemId));
+  if (!item) return;
+
+  const fields = [
+    ['ID', item.id],
+    ['Category', item.category],
+    ['Item Name', item.item_name],
+    ['Model / Specification', item.model_or_specification],
+    ['Manufacturer', item.manufacturer],
+    ['Brand', item.brand],
+    ['Purpose', item.purpose],
+    ['Quality', item.quality],
+    ['Quantity', item.quantity],
+    ['Price', formatNumber(item.price)],
+    ['Grand Total', formatNumber(item.grand_total)],
+    ['Remarks', item.remarks],
+    ['Comments', item.comments],
+    ['Deadline', item.deadline],
+    ['1 Month Quantity', item.one_month_quantity],
+    ['3 Month Quantity', item.three_month_quantity],
+    ['Source Sheet', item.source_sheet],
+    ['Created At', item.created_at],
+    ['Updated At', item.updated_at],
+    ['Updated By', item.updated_by]
+  ];
+
+  document.getElementById('detailsContent').innerHTML = fields.map(([label, value]) => `
+    <div class="detail-card">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value === undefined || value === null || value === '' ? '-' : String(value))}</strong>
+    </div>
+  `).join('');
+
+  document.getElementById('detailsModal').classList.remove('hidden');
+}
+
+function closeDetails() {
+  document.getElementById('detailsModal').classList.add('hidden');
 }
 
 function updateStats() {
   document.getElementById('totalItems').textContent = inventory.length;
 
-  const totalQty = inventory.reduce((sum, item) => {
-    return sum + (Number(item.quantity) || 0);
-  }, 0);
-
+  const totalQty = inventory.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
   document.getElementById('totalQty').textContent = totalQty;
   document.getElementById('lastRefresh').textContent = new Date().toLocaleTimeString();
 }
@@ -101,9 +142,15 @@ function escapeHtml(str) {
     .replaceAll("'", '&#39;');
 }
 
+function escapeJs(str) {
+  return String(str).replaceAll('\\', '\\\\').replaceAll("'", "\\'");
+}
+
 document.getElementById('searchInput').addEventListener('input', renderInventory);
 document.getElementById('categoryFilter').addEventListener('change', renderInventory);
 document.getElementById('refreshBtn').addEventListener('click', fetchInventory);
+document.getElementById('closeDetailsBtn').addEventListener('click', closeDetails);
+document.getElementById('detailsBackdrop').addEventListener('click', closeDetails);
 
 fetchInventory();
 setInterval(fetchInventory, 30000);
