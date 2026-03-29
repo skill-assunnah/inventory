@@ -3,70 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inventory Admin</title>
+  <title>Inventory</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <div class="page">
     <header class="topbar">
       <div>
-        <h1>Inventory Admin</h1>
-        <p class="muted">Only approved Gmail accounts can add data</p>
+        <h1>Inventory List</h1>
+        <p class="muted">Live inventory synced from Google Sheet</p>
       </div>
-      <a class="admin-link" href="index.html">Home</a>
+      <a class="admin-link" href="admin.html">Admin</a>
     </header>
 
-    <section class="card">
-      <div id="signinBox">
-        <div id="g_id_onload"
-             data-client_id="PUT_YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com"
-             data-callback="handleCredentialResponse"></div>
-        <div class="g_id_signin" data-type="standard"></div>
+    <section class="stats">
+      <div class="card stat-card">
+        <span>Total Items</span>
+        <strong id="totalItems">0</strong>
       </div>
-
-      <div id="adminStatus" class="muted"></div>
+      <div class="card stat-card">
+        <span>Total Quantity</span>
+        <strong id="totalQty">0</strong>
+      </div>
+      <div class="card stat-card">
+        <span>Last Refresh</span>
+        <strong id="lastRefresh">-</strong>
+      </div>
     </section>
 
-    <section class="card hidden" id="adminPanel">
-      <h2>Add Inventory Item</h2>
+    <section class="controls card">
+      <input type="text" id="searchInput" placeholder="Search item, brand, category..." />
+      <select id="categoryFilter">
+        <option value="">All Categories</option>
+      </select>
+      <button id="refreshBtn">Refresh</button>
+    </section>
 
-      <form id="itemForm" class="form-grid">
-        <select name="category" required>
-          <option value="">Select category</option>
-          <option>Lab Tools</option>
-          <option>Lab Equipment</option>
-          <option>Safety Equipment</option>
-          <option>Furniture Items</option>
-          <option>Consumable Items</option>
-        </select>
-
-        <input name="item_name" placeholder="Item name" required />
-        <input name="model_or_specification" placeholder="Model / Specification" />
-        <input name="manufacturer" placeholder="Manufacturer" />
-        <input name="brand" placeholder="Brand" />
-        <input name="purpose" placeholder="Purpose" />
-        <input name="quality" placeholder="Quality" />
-        <input name="quantity" type="number" placeholder="Quantity" />
-        <input name="price" type="number" step="0.01" placeholder="Price" />
-        <input name="grand_total" type="number" step="0.01" placeholder="Grand total" />
-        <input name="deadline" placeholder="Deadline" />
-        <input name="one_month_quantity" type="number" placeholder="1 month quantity" />
-        <input name="three_month_quantity" type="number" placeholder="3 month quantity" />
-        <input name="source_sheet" placeholder="Source sheet / category" />
-
-        <textarea name="remarks" placeholder="Remarks"></textarea>
-        <textarea name="comments" placeholder="Comments"></textarea>
-
-        <div class="form-actions">
-          <button type="submit">Add Item</button>
-        </div>
-      </form>
-
-      <p id="formMessage" class="muted"></p>
+    <section class="table-wrap card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Category</th>
+              <th>Item Name</th>
+              <th>Brand</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Grand Total</th>
+              <th>Remarks</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTableBody">
+            <tr><td colspan="9" class="center">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </div>
 
-  <script src="admin.js"></script>
+  <div class="modal hidden" id="detailsModal">
+    <div class="modal-backdrop" id="detailsBackdrop"></div>
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2>Item Details</h2>
+        <button class="icon-btn" id="closeDetailsBtn" type="button">×</button>
+      </div>
+      <div id="detailsContent" class="details-grid"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
