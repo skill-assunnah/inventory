@@ -4,33 +4,35 @@ let inventory = [];
 
 async function fetchInventory() {
   const tbody = document.getElementById('inventoryTableBody');
-  tbody.innerHTML = '<tr><td colspan="9" class="center">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="9" class="center muted-cell">Loading...</td></tr>';
 
   try {
     const res = await fetch(`${API_URL}?action=list`);
     const json = await res.json();
 
-    if (!json.success) throw new Error(json.message || 'Failed to load inventory.');
+    if (!json.success) {
+      throw new Error(json.message || 'Failed to load inventory.');
+    }
 
     inventory = json.data || [];
     populateCategoryFilter(inventory);
     renderInventory();
     updateStats();
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="9" class="center">${err.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="center muted-cell">${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
 function populateCategoryFilter(items) {
   const select = document.getElementById('categoryFilter');
   const current = select.value;
-  const categories = [...new Set(items.map(i => i.category).filter(Boolean))];
+  const categories = [...new Set(items.map(item => item.category).filter(Boolean))];
 
-  select.innerHTML = '<option value="">All Categories</option>';
-  categories.forEach(cat => {
+  select.innerHTML = '<option value="">All</option>';
+  categories.forEach(category => {
     const option = document.createElement('option');
-    option.value = cat;
-    option.textContent = cat;
+    option.value = category;
+    option.textContent = category;
     select.appendChild(option);
   });
   select.value = current;
@@ -40,45 +42,54 @@ function renderInventory() {
   const tbody = document.getElementById('inventoryTableBody');
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
   const category = document.getElementById('categoryFilter').value;
+  const field = document.getElementById('fieldFilter').value;
 
   const filtered = inventory.filter(item => {
     const matchesCategory = !category || item.category === category;
-    const haystack = [
-      item.id,
-      item.category,
-      item.item_name,
-      item.brand,
-      item.remarks,
-      item.model_or_specification,
-      item.manufacturer
-    ].join(' ').toLowerCase();
 
-    const matchesSearch = !search || haystack.includes(search);
+    let haystack = '';
+    if (field === 'all') {
+      haystack = [
+        item.id,
+        item.item_name,
+        item.category,
+        item.brand,
+        item.manufacturer,
+        item.model_or_specification,
+        item.remarks
+      ].join(' ');
+    } else {
+      haystack = String(item[field] || '');
+    }
+
+    const matchesSearch = !search || haystack.toLowerCase().includes(search);
     return matchesCategory && matchesSearch;
   });
 
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="9" class="center">No items found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" class="center muted-cell">No items found.</td></tr>';
     return;
   }
 
   tbody.innerHTML = filtered.map(item => `
     <tr>
-      <td>${escapeHtml(item.id)}</td>
-      <td>${escapeHtml(item.category)}</td>
-      <td>${escapeHtml(item.item_name)}</td>
-      <td>${escapeHtml(item.brand || '')}</td>
-      <td>${escapeHtml(String(item.quantity || ''))}</td>
+      <td>${escapeHtml(item.id || '')}</td>
+      <td>${escapeHtml(item.item_name || '')}</td>
+      <td><span class="category-chip">${escapeHtml(item.category || '-')}</span></td>
+      <td>${escapeHtml(item.brand || '-')}</td>
+      <td>${escapeHtml(String(item.quantity || '0'))}</td>
       <td>${formatNumber(item.price)}</td>
       <td>${formatNumber(item.grand_total)}</td>
-      <td>${escapeHtml(item.remarks || '')}</td>
-      <td><button type="button" class="small-btn" onclick="openDetails('${escapeJs(item.id)}')">View</button></td>
+      <td>${escapeHtml(item.remarks || '-')}</td>
+      <td>
+        <button type="button" class="view-btn" onclick="openDetails('${escapeJs(item.id || '')}')">View</button>
+      </td>
     </tr>
   `).join('');
 }
 
 function openDetails(itemId) {
-  const item = inventory.find(i => String(i.id) === String(itemId));
+  const item = inventory.find(entry => String(entry.id) === String(itemId));
   if (!item) return;
 
   const fields = [
@@ -119,16 +130,22 @@ function closeDetails() {
 }
 
 function updateStats() {
-  document.getElementById('totalItems').textContent = inventory.length;
+  const totalItems = inventory.length;
   const totalQty = inventory.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-  document.getElementById('totalQty').textContent = totalQty;
+  const totalCategories = new Set(inventory.map(item => item.category).filter(Boolean)).size;
+  const totalValue = inventory.reduce((sum, item) => sum + (Number(item.grand_total) || 0), 0);
+
+  document.getElementById('totalItems').textContent = totalItems.toLocaleString();
+  document.getElementById('totalQty').textContent = totalQty.toLocaleString();
+  document.getElementById('totalCategories').textContent = totalCategories.toLocaleString();
+  document.getElementById('totalValue').textContent = totalValue.toLocaleString();
   document.getElementById('lastRefresh').textContent = new Date().toLocaleTimeString();
 }
 
 function formatNumber(value) {
-  if (value === '' || value === null || value === undefined) return '';
+  if (value === '' || value === null || value === undefined) return '-';
   const num = Number(value);
-  if (Number.isNaN(num)) return value;
+  if (Number.isNaN(num)) return escapeHtml(String(value));
   return num.toLocaleString();
 }
 
@@ -147,7 +164,9 @@ function escapeJs(str) {
 
 document.getElementById('searchInput').addEventListener('input', renderInventory);
 document.getElementById('categoryFilter').addEventListener('change', renderInventory);
+document.getElementById('fieldFilter').addEventListener('change', renderInventory);
 document.getElementById('refreshBtn').addEventListener('click', fetchInventory);
+document.getElementById('refreshBtnTop').addEventListener('click', fetchInventory);
 document.getElementById('closeDetailsBtn').addEventListener('click', closeDetails);
 document.getElementById('detailsBackdrop').addEventListener('click', closeDetails);
 
