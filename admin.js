@@ -23,7 +23,7 @@ async function checkAdmin() {
     const json = await res.json();
 
     if (!json.success || !json.isAuthenticated) {
-      status.textContent = 'Sign-in failed or token expired.';
+      status.textContent = json.message || 'Sign-in failed or token expired.';
       return;
     }
 
@@ -155,7 +155,7 @@ async function deleteItem(itemId) {
   }
 }
 
-document.getElementById('itemForm').addEventListener('submit', async (e) => {
+document.getElementById('itemForm').addEventListener('submit', async function(e) {
   e.preventDefault();
 
   const formMessage = document.getElementById('formMessage');
@@ -168,7 +168,7 @@ document.getElementById('itemForm').addEventListener('submit', async (e) => {
     const payload = {
       action: editingItemId ? 'update' : 'add',
       idToken: currentIdToken,
-      item
+      item: item
     };
 
     if (editingItemId) payload.itemId = editingItemId;
@@ -190,7 +190,7 @@ document.getElementById('itemForm').addEventListener('submit', async (e) => {
   }
 });
 
-document.getElementById('cancelEditBtn').addEventListener('click', () => {
+document.getElementById('cancelEditBtn').addEventListener('click', function() {
   resetFormMode();
   document.getElementById('formMessage').textContent = 'Edit cancelled.';
 });
