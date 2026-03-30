@@ -19,6 +19,8 @@
 
       <div class="top-actions">
         <button class="icon-btn" type="button" id="refreshBtnTop" title="Refresh">↻</button>
+        <button class="icon-btn" type="button" id="printBtn" title="Print">⎙</button>
+        <button class="icon-btn" type="button" id="exportBtn" title="Export CSV">⇩</button>
       </div>
     </header>
 
@@ -30,15 +32,30 @@
     </nav>
 
     <main class="main-content">
+      <section class="sticky-summary">
+        <div class="sticky-pill">
+          <span>Total Items</span>
+          <strong id="stickyTotalItems">0</strong>
+        </div>
+        <div class="sticky-pill">
+          <span>Total Qty</span>
+          <strong id="stickyTotalQty">0</strong>
+        </div>
+        <div class="sticky-pill">
+          <span>Total Value</span>
+          <strong id="stickyTotalValue">0</strong>
+        </div>
+        <div class="sticky-pill">
+          <span>Updated</span>
+          <strong id="lastRefresh">-</strong>
+        </div>
+      </section>
+
       <section class="hero-panel">
         <div class="hero-title-row">
           <div>
             <h2>Inventory Stock</h2>
-            <p class="subtext">Search, filter, and review all available inventory items.</p>
-          </div>
-          <div class="last-refresh-wrap">
-            <span>Last Refresh</span>
-            <strong id="lastRefresh">-</strong>
+            <p class="subtext">Search, filter, review, export, and print inventory records.</p>
           </div>
         </div>
 
@@ -86,6 +103,16 @@
             <input type="text" id="searchInput" placeholder="Search inventory..." />
           </div>
 
+          <div class="filter-group">
+            <label for="rowsPerPage">Rows</label>
+            <select id="rowsPerPage">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+
           <div class="filter-actions">
             <button id="refreshBtn" type="button" class="primary-btn">Refresh</button>
           </div>
@@ -113,6 +140,15 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div class="table-footer">
+            <div class="table-meta" id="tableMeta">Showing 0 items</div>
+            <div class="pagination-wrap">
+              <button type="button" class="page-btn" id="prevPageBtn">‹</button>
+              <span id="pageInfo">Page 1</span>
+              <button type="button" class="page-btn" id="nextPageBtn">›</button>
+            </div>
           </div>
         </div>
       </section>
