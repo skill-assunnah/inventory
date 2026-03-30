@@ -120,7 +120,6 @@ function closeDetails() {
 
 function updateStats() {
   document.getElementById('totalItems').textContent = inventory.length;
-
   const totalQty = inventory.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
   document.getElementById('totalQty').textContent = totalQty;
   document.getElementById('lastRefresh').textContent = new Date().toLocaleTimeString();
