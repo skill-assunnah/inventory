@@ -3,71 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inventory</title>
+  <title>Inventory Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="page">
-    <header class="topbar">
-      <div>
-        <h1>Inventory List</h1>
-        <p class="muted">Live inventory synced from Google Sheet</p>
+  <div class="app-shell">
+    <header class="top-header">
+      <div class="brand-block">
+        <div class="brand-logo">I</div>
+        <div>
+          <h1>Inventory Dashboard</h1>
+          <p>Live inventory synced from Google Sheet</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn" type="button" id="refreshBtnTop" title="Refresh">↻</button>
       </div>
     </header>
 
-    <section class="stats">
-      <div class="card stat-card">
-        <span>Total Items</span>
-        <strong id="totalItems">0</strong>
-      </div>
-      <div class="card stat-card">
-        <span>Total Quantity</span>
-        <strong id="totalQty">0</strong>
-      </div>
-      <div class="card stat-card">
-        <span>Last Refresh</span>
-        <strong id="lastRefresh">-</strong>
-      </div>
-    </section>
+    <nav class="top-nav">
+      <button class="nav-pill active" type="button">Inventory</button>
+      <button class="nav-pill" type="button" disabled>Overview</button>
+      <button class="nav-pill" type="button" disabled>Reports</button>
+      <button class="nav-pill" type="button" disabled>Archive</button>
+    </nav>
 
-    <section class="controls card">
-      <input type="text" id="searchInput" placeholder="Search item, brand, category..." />
-      <select id="categoryFilter">
-        <option value="">All Categories</option>
-      </select>
-      <button id="refreshBtn" type="button">Refresh</button>
-    </section>
+    <main class="main-content">
+      <section class="hero-panel">
+        <div class="hero-title-row">
+          <div>
+            <h2>Inventory Stock</h2>
+            <p class="subtext">Search, filter, and review all available inventory items.</p>
+          </div>
+          <div class="last-refresh-wrap">
+            <span>Last Refresh</span>
+            <strong id="lastRefresh">-</strong>
+          </div>
+        </div>
 
-    <section class="table-wrap card">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Category</th>
-              <th>Item Name</th>
-              <th>Brand</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Grand Total</th>
-              <th>Remarks</th>
-              <th>View</th>
-            </tr>
-          </thead>
-          <tbody id="inventoryTableBody">
-            <tr><td colspan="9" class="center">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span>Total Items</span>
+            <strong id="totalItems">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Total Quantity</span>
+            <strong id="totalQty">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Categories</span>
+            <strong id="totalCategories">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Total Value</span>
+            <strong id="totalValue">0</strong>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="categoryFilter">Category</label>
+            <select id="categoryFilter">
+              <option value="">All</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="fieldFilter">Column</label>
+            <select id="fieldFilter">
+              <option value="all">All fields</option>
+              <option value="item_name">Item Name</option>
+              <option value="brand">Brand</option>
+              <option value="category">Category</option>
+              <option value="manufacturer">Manufacturer</option>
+              <option value="model_or_specification">Model / Specification</option>
+            </select>
+          </div>
+
+          <div class="filter-group search-group">
+            <label for="searchInput">Search</label>
+            <input type="text" id="searchInput" placeholder="Search inventory..." />
+          </div>
+
+          <div class="filter-actions">
+            <button id="refreshBtn" type="button" class="primary-btn">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Item Name</th>
+                  <th>Category</th>
+                  <th>Brand</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Total Value</th>
+                  <th>Remarks</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody">
+                <tr>
+                  <td colspan="9" class="center muted-cell">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <div class="modal hidden" id="detailsModal">
     <div class="modal-backdrop" id="detailsBackdrop"></div>
     <div class="modal-panel">
       <div class="modal-header">
-        <h2>Item Details</h2>
-        <button class="icon-btn" id="closeDetailsBtn" type="button">×</button>
+        <div>
+          <h3>Item Details</h3>
+          <p class="subtext">Full information from the inventory sheet</p>
+        </div>
+        <button class="icon-btn dark" id="closeDetailsBtn" type="button">×</button>
       </div>
       <div id="detailsContent" class="details-grid"></div>
     </div>
